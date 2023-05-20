@@ -9,6 +9,8 @@
 <body>
     <div id="text"></div>
 
+    <div id="file-input"></div>
+
     <script type="module">
         import init, {Perceptron, read_file} from './pkg/rust_wasm.js'
 
@@ -51,15 +53,29 @@
         console.log('Demorou ', (end_time-init_time), 'ms para terminar a execução de ', n, 'x, gastando ', ((end_time-init_time))/n, 'ms por iteração')
         console.log(x.get_perceptron())
 
-        const fileData = read_file('teste.txt')
+        // Leitura de arquivo
+        function readTextFile(file) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.open("GET", file, false);
 
-        fileData.then(data => {
-            // Deu certo a leitura em rust
-            console.log(data);
-        }).catch(error => {
-            // Não deu certo a leitura em rust
-            console.error(error);
-        });
+            var fileContent = "";
+
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4) {
+                    if (rawFile.status === 200 || rawFile.status == 0) {
+                        fileContent = rawFile.responseText;
+                    }
+                }
+            }
+
+            rawFile.send(null);
+
+            return fileContent;
+        }
+
+        const t = readTextFile('teste.txt')
+
+        console.log(t)
     </script>
 </body>
 </html>
