@@ -1,6 +1,11 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} file_path
+* @returns {Uint8Array}
+*/
+export function read_file(file_path: string): Uint8Array;
+/**
 */
 export class Perceptron {
   free(): void;
@@ -18,13 +23,10 @@ export class Perceptron {
   set_step_size(step_size: number): void;
 /**
 * @param {number} n_iter
-* @returns {string}
+* @param {boolean} verbose
+* @returns {any[]}
 */
-  train_with_verbose(n_iter: number): string;
-/**
-* @param {number} n_iter
-*/
-  train_without_verbose(n_iter: number): void;
+  train(n_iter: number, verbose: boolean): any[];
 /**
 * @returns {string}
 */
@@ -42,13 +44,14 @@ export interface InitOutput {
   readonly __wbg_perceptron_free: (a: number) => void;
   readonly perceptron_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly perceptron_set_step_size: (a: number, b: number) => void;
-  readonly perceptron_train_with_verbose: (a: number, b: number, c: number) => void;
-  readonly perceptron_train_without_verbose: (a: number, b: number) => void;
+  readonly perceptron_train: (a: number, b: number, c: number, d: number) => void;
   readonly perceptron_get_perceptron: (a: number, b: number) => void;
   readonly perceptron_get_accuracy: (a: number) => number;
+  readonly read_file: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
+  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

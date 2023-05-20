@@ -10,7 +10,7 @@
     <div id="text"></div>
 
     <script type="module">
-        import init, {Perceptron} from './pkg/rust_wasm.js'
+        import init, {Perceptron, read_file} from './pkg/rust_wasm.js'
 
         await init()
         
@@ -33,18 +33,33 @@
         const answ_index = 2
 
         // new(params: &[usize], data: &[f32], answ_index: usize, rows: usize, cols: usize)
-        const x = new Perceptron([0], data, answ_index, rows, cols, 0.01)
-        x.set_step_size(0.01)
+        const x = new Perceptron([1], data, answ_index, rows, cols, 0.01)
+        x.set_step_size(0.00001)
+
+        const n_iter = 10000000
 
         console.log(x.get_perceptron())
         const init_time = Date.now() 
-        const w = x.train_with_verbose(10000000)
+        const w = x.train(n_iter, false)
         const end_time = Date.now()
         const acc = x.get_accuracy()
 
+        const [info_train, n] = w
+
         console.log(w)
-        console.log('Demorou ', (end_time-init_time)/1000, 's para terminar a execução de 10000000x')
+        console.log(info_train)
+        console.log('Demorou ', (end_time-init_time), 'ms para terminar a execução de ', n, 'x, gastando ', ((end_time-init_time))/n, 'ms por iteração')
         console.log(x.get_perceptron())
+
+        const fileData = read_file('teste.txt')
+
+        fileData.then(data => {
+            // Deu certo a leitura em rust
+            console.log(data);
+        }).catch(error => {
+            // Não deu certo a leitura em rust
+            console.error(error);
+        });
     </script>
 </body>
 </html>
