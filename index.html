@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="text"></div>
+
+    <script type="module">
+        import init, {Perceptron} from './pkg/rust_wasm.js'
+
+        await init()
+        
+        let data = [[2.7810836,2.550537003,0],
+                [1.465489372,2.362125076,0],
+                [3.396561688,4.400293529,0],
+                [1.38807019,1.850220317,0],
+                [3.06407232,3.005305973,0],
+                [7.627531214,2.759262235,1],
+                [5.332441248,2.088626775,1],
+                [6.922596716,1.77106367,1],
+                [8.675418651,-0.242068655,1]]
+        
+        const rows = data.length
+        console.log(rows)
+        const cols = data[0].length
+        console.log(cols)
+
+        data = data.flat()
+        const answ_index = 2
+
+        // new(params: &[usize], data: &[f32], answ_index: usize, rows: usize, cols: usize)
+        const x = new Perceptron([0], data, answ_index, rows, cols, 0.01)
+        x.set_step_size(0.01)
+
+        console.log(x.get_perceptron())
+        const init_time = Date.now() 
+        const w = x.train_with_verbose(10000000)
+        const end_time = Date.now()
+        const acc = x.get_accuracy()
+
+        console.log(w)
+        console.log('Demorou ', (end_time-init_time)/1000, 's para terminar a execução de 10000000x')
+        console.log(x.get_perceptron())
+    </script>
+</body>
+</html>
