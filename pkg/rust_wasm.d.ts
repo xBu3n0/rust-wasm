@@ -1,32 +1,35 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} file_path
-* @returns {Uint8Array}
+* @param {Uint32Array} params
+* @param {string} data_str
+* @param {number} answ_index
+* @returns {Perceptron}
 */
-export function read_file(file_path: string): Uint8Array;
-/**
-*/
-export class Perceptron {
-  free(): void;
+export function new_perceptron_from_string(params: Uint32Array, data_str: string, answ_index: number): Perceptron;
 /**
 * @param {Uint32Array} params
 * @param {Float64Array} data
 * @param {number} answ_index
 * @param {number} rows
 * @param {number} cols
+* @returns {Perceptron}
 */
-  constructor(params: Uint32Array, data: Float64Array, answ_index: number, rows: number, cols: number);
+export function new_perceptron_from_vec(params: Uint32Array, data: Float64Array, answ_index: number, rows: number, cols: number): Perceptron;
+/**
+*/
+export class Perceptron {
+  free(): void;
 /**
 * @param {number} step_size
 */
   set_step_size(step_size: number): void;
 /**
-* @param {number} n_iter
+* @param {number} n_max_iter
 * @param {boolean} verbose
 * @returns {any[]}
 */
-  train(n_iter: number, verbose: boolean): any[];
+  train(n_max_iter: number, verbose: boolean): any[];
 /**
 * @returns {string}
 */
@@ -42,16 +45,17 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_perceptron_free: (a: number) => void;
-  readonly perceptron_new: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
+  readonly new_perceptron_from_string: (a: number, b: number, c: number, d: number, e: number) => number;
+  readonly new_perceptron_from_vec: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => number;
   readonly perceptron_set_step_size: (a: number, b: number) => void;
   readonly perceptron_train: (a: number, b: number, c: number, d: number) => void;
   readonly perceptron_get_perceptron: (a: number, b: number) => void;
   readonly perceptron_get_accuracy: (a: number) => number;
-  readonly read_file: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
+  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
