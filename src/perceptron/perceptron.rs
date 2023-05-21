@@ -1,5 +1,7 @@
-use wasm_bindgen::prelude::*;
+use std::rc::Rc;
+
 use rand::{self, Rng};
+use wasm_bindgen::prelude::*;
 
 // Perceptron
 #[derive(Debug)]
@@ -8,22 +10,46 @@ pub struct Perceptron {
     parameters: Vec<usize>,
     weight: Vec<f64>,
     bias: f64,
-    data: Vec<Vec<f64>>,
+    data: Rc<Vec<Vec<f64>>>,
     answ_index: usize,
     step_size: f64,
-    accurary: f64
+    accurary: f64,
+}
+
+pub fn new_perceptron_to_wrapper(
+    data: Rc<Vec<Vec<f64>>>,
+    params: Vec<usize>,
+    answ_index: usize,
+    step_size: f64,
+) -> Perceptron {
+    let params: Vec<usize> = params
+        .iter()
+        .filter_map(|&x| if x != answ_index { Some(x) } else { None })
+        .collect();
+    let mut rng = rand::thread_rng();
+
+    Perceptron {
+        weight: (0..params.len()).map(|_| rng.gen::<f64>() - 0.5).collect(),
+        parameters: params,
+        bias: rng.gen::<f64>() - 0.5,
+        answ_index,
+        data,
+        step_size: step_size,
+        accurary: 0.0,
+    }
 }
 
 #[wasm_bindgen]
-pub fn new_perceptron_from_string(params: &[usize], data_str: String, answ_index: usize) -> Perceptron {
-    let params: Vec<usize> = params.iter().filter_map(|&x| {
-        if x != answ_index {
-            Some(x)
-        } else {
-            None
-        }
-    }).collect();
-    let data: Vec<Vec<f64>> = ProcessData::evaluate_data(data_str);
+pub fn new_perceptron_from_string(
+    params: &[usize],
+    data_str: String,
+    answ_index: usize,
+) -> Perceptron {
+    let params: Vec<usize> = params
+        .iter()
+        .filter_map(|&x| if x != answ_index { Some(x) } else { None })
+        .collect();
+    let data: Rc<Vec<Vec<f64>>> = ProcessData::evaluate_data(data_str);
     let mut rng = rand::thread_rng();
 
     Perceptron {
@@ -33,19 +59,22 @@ pub fn new_perceptron_from_string(params: &[usize], data_str: String, answ_index
         answ_index,
         data,
         step_size: 0.01,
-        accurary: 0.0
+        accurary: 0.0,
     }
 }
 
 #[wasm_bindgen]
-pub fn new_perceptron_from_vec(params: &[usize], data: &[f64], answ_index: usize, rows: usize, cols: usize) -> Perceptron {
-    let params: Vec<usize> = params.iter().filter_map(|&x| {
-        if x != answ_index {
-            Some(x)
-        } else {
-            None
-        }
-    }).collect();
+pub fn new_perceptron_from_vec(
+    params: &[usize],
+    data: &[f64],
+    answ_index: usize,
+    rows: usize,
+    cols: usize,
+) -> Perceptron {
+    let params: Vec<usize> = params
+        .iter()
+        .filter_map(|&x| if x != answ_index { Some(x) } else { None })
+        .collect();
     let mut rng = rand::thread_rng();
 
     Perceptron {
@@ -55,7 +84,7 @@ pub fn new_perceptron_from_vec(params: &[usize], data: &[f64], answ_index: usize
         answ_index,
         data: ProcessData::vec_to_matrix(data, rows, cols),
         step_size: 0.01,
-        accurary: 0.0
+        accurary: 0.0,
     }
 }
 
@@ -74,12 +103,14 @@ impl Perceptron {
                 last_accuracy = self.eval();
                 n += 1;
                 if last_accuracy == 1.0 {
-                    break 'l
+                    break 'l;
                 }
             }
 
-            let info_train: String = 
-                format!("O treino finalizou, a % de acerto atingida pelo programa foi de {:.2}%", last_accuracy * 100.0);
+            let info_train: String = format!(
+                "O treino finalizou, a % de acerto atingida pelo programa foi de {:.2}%",
+                last_accuracy * 100.0
+            );
 
             vec![JsValue::from(info_train), JsValue::from(n)]
         } else {
@@ -90,11 +121,11 @@ impl Perceptron {
                 v.push(format!("{:.2}", self.eval()));
                 n += 1;
 
-                if v[v.len()-1] == "1.00" {
-                    break 'l
+                if v.last().unwrap() == "1.00" {
+                    break 'l;
                 }
             }
-    
+
             vec![JsValue::from(v.join(" -> ")), JsValue::from(n)]
         }
     }
@@ -108,22 +139,25 @@ impl Perceptron {
             }
         }
 
-        self.accurary = sum/(self.data.len() as f64);
+        self.accurary = sum / (self.data.len() as f64);
         self.accurary
     }
 
     fn update(&mut self, row_index: usize) -> bool {
-        let answ: f64 = Self::activate_function((0..self.parameters.len()).fold(self.bias, |sum, acc| {
-            sum + self.data[row_index][acc] * self.weight[acc]
-        }));
+        let answ: f64 =
+            Self::activate_function((0..self.parameters.len()).fold(self.bias, |sum, acc| {
+                sum + self.data[row_index][acc] * self.weight[acc]
+            }));
 
         if answ != self.data[row_index][self.answ_index] {
             for i in 0..self.weight.len() {
-                self.weight[i] -= self.step_size * self.data[row_index][self.parameters[i]] * (answ - self.data[row_index][self.answ_index])
+                self.weight[i] -= self.step_size
+                    * self.data[row_index][self.parameters[i]]
+                    * (answ - self.data[row_index][self.answ_index])
             }
 
             self.bias -= self.step_size * (answ - self.data[row_index][self.answ_index]);
-            
+
             false
         } else {
             true
@@ -147,9 +181,7 @@ impl Perceptron {
     }
 }
 
-struct ProcessData {
-
-}
+pub struct ProcessData {}
 
 impl ProcessData {
     fn process(s: &str) -> f64 {
@@ -161,31 +193,34 @@ impl ProcessData {
             "f" => 1.0,
             "t" => 2.0,
             "?" => 0.0,
-            num => num.parse().unwrap()
+            num => num.parse().unwrap(),
         }
     }
-    
-    fn evaluate_data(data: String) -> Vec<Vec<f64>> {
+
+    pub fn evaluate_data(data: String) -> Rc<Vec<Vec<f64>>> {
         let rows: std::str::Split<&str> = data.split("\n");
-        let mut vec_data: Vec<Vec<f64>> = Vec::new();
-    
-        rows.into_iter().for_each(|r| {
-            let values: Vec<f64> = r.split(",").map(|s| Self::process(s)).collect();
-            vec_data.push(values);
-        });
-    
-        vec_data
+        let mut v: Vec<Vec<f64>> = Vec::new();
+
+        Rc::from(
+            rows.into_iter()
+                .fold(&mut v, |v, r| {
+                    let values: Vec<f64> = r.split(",").map(|s| Self::process(s)).collect();
+                    v.push(values);
+                    v
+                })
+                .to_owned()
+        )
     }
-    
-    fn vec_to_matrix(data: &[f64], rows: usize, cols: usize) -> Vec<Vec<f64>> {
+
+    fn vec_to_matrix(data: &[f64], rows: usize, cols: usize) -> Rc<Vec<Vec<f64>>> {
         let mut matrix: Vec<Vec<f64>> = vec![vec![0.0; cols]; rows];
-        
+
         for i in 0..rows {
             for j in 0..cols {
                 matrix[i][j] = data[cols * i + j]
             }
         }
 
-        matrix
+        Rc::from(matrix)
     }
 }

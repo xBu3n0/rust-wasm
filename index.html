@@ -1,138 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
     <div id="text"></div>
 
     <div id="file-input"></div>
 
-    <script type="module">
-        import init, {Perceptron, new_perceptron_from_vec, new_perceptron_from_string} from './pkg/rust_wasm.js'
-
-        await init()
-        
-        const n_max_iter = 10000
-        const verbose = false
-
-        // Leitura de arquivo
-        function readTextFile(file) {
-            let rawFile = new XMLHttpRequest();
-            rawFile.open("GET", file, false);
-
-            let fileContent = "";
-
-            rawFile.onreadystatechange = function () {
-                if (rawFile.readyState === 4) {
-                    if (rawFile.status === 200 || rawFile.status == 0) {
-                        fileContent = rawFile.responseText;
-                    }
-                }
-            }
-
-            rawFile.send(null);
-
-            return fileContent;
-        }
-
-        const params = []
-        
-        for(let i = 0; i < 34; ++i) {
-            params.push(i)
-        }
-
-        const answ_index = 34
-        
-        // new_from_string(params: &[usize], data_str: String, answ_index: usize)
-        const y = new_perceptron_from_string(params, readTextFile('ionosphere.data'), answ_index)
-        console.log(y.get_perceptron())
-
-        let init_time = Date.now() 
-        let w = y.train(n_max_iter, verbose)
-        let end_time = Date.now()
-
-        console.log(w[0])
-        console.log('Demorou ', (end_time-init_time), 'ms para terminar a execução ', w[1], 'x, gastando ', ((end_time-init_time))/w[1], 'ms por iteração')
-</script>
+    <script type="module" src="./index.js"></script>
 </body>
+
 </html>
-<!--
-        // let data = [[2.7810836,2.550537003,0],
-        //         [1.465489372,2.362125076,0],
-        //         [3.396561688,4.400293529,0],
-        //         [1.38807019,1.850220317,0],
-        //         [3.06407232,3.005305973,0],
-        //         [7.627531214,2.759262235,1],
-        //         [5.332441248,2.088626775,1],
-        //         [6.922596716,1.77106367,1],
-        //         [8.675418651,-0.242068655,1]]
-        
-        // const rows = data.length
-        // console.log(rows)
-        // const cols = data[0].length
-        // console.log(cols)
-
-        // data = data.flat()
-        // const answ_index = 2
-
-        // new_from_vec(params: &[usize], data: &[f32], answ_index: usize, rows: usize, cols: usize)
-        // const x = new_perceptron_from_vec([1], data, answ_index, rows, cols, 0.01)
-        // x.set_step_size(0.00001)
-
-        // const n_max_iter = 100000
-        // const verbose = false
-
-        // console.log(x.get_perceptron())
-        // let init_time = Date.now() 
-        // let w = x.train(n_max_iter, verbose)
-        // let end_time = Date.now()
-        // let acc = x.get_accuracy()
-
-        // let [info_train, n] = w
-
-        // console.log(w)
-        // console.log(info_train)
-        // console.log('Demorou ', (end_time-init_time), 'ms para terminar a execução ', n, 'x, gastando ', ((end_time-init_time))/n, 'ms por iteração')
-        // console.log(x.get_perceptron())
-        // let data = [[2.7810836,2.550537003,0],
-        //         [1.465489372,2.362125076,0],
-        //         [3.396561688,4.400293529,0],
-        //         [1.38807019,1.850220317,0],
-        //         [3.06407232,3.005305973,0],
-        //         [7.627531214,2.759262235,1],
-        //         [5.332441248,2.088626775,1],
-        //         [6.922596716,1.77106367,1],
-        //         [8.675418651,-0.242068655,1]]
-        
-        // const rows = data.length
-        // console.log(rows)
-        // const cols = data[0].length
-        // console.log(cols)
-
-        // data = data.flat()
-        // const answ_index = 2
-
-        // new_from_vec(params: &[usize], data: &[f32], answ_index: usize, rows: usize, cols: usize)
-        // const x = new_perceptron_from_vec([1], data, answ_index, rows, cols, 0.01)
-        // x.set_step_size(0.00001)
-
-        // const n_max_iter = 100000
-        // const verbose = false
-
-        // console.log(x.get_perceptron())
-        // let init_time = Date.now() 
-        // let w = x.train(n_max_iter, verbose)
-        // let end_time = Date.now()
-        // let acc = x.get_accuracy()
-
-        // let [info_train, n] = w
-
-        // console.log(w)
-        // console.log(info_train)
-        // console.log('Demorou ', (end_time-init_time), 'ms para terminar a execução ', n, 'x, gastando ', ((end_time-init_time))/n, 'ms por iteração')
-        // console.log(x.get_perceptron())
--->
