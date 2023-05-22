@@ -151,9 +151,9 @@ impl Perceptron {
             .collect();
         let mut rng = rand::thread_rng();
         
-        self.weight = (0..new_params.len()).map(|_| rng.gen::<f64>() - 0.5).collect();
+        self.weight = vec![0.0; new_params.len()];
         self.parameters = new_params;
-        self.bias = rng.gen::<f64>() - 0.5;
+        self.bias = 0.0;
     }
 
     fn activate_function(sum: f64) -> f64 {

@@ -41,8 +41,8 @@ impl Wrapper {
             // result.push(to_value(&best_ind.0).unwrap());
             result.push(to_value(&best_ind.1).unwrap());
             result.push(to_value(&self.population[best_ind.0].get_parameters()).unwrap());
-            // result.push(to_value(&self.population[best_ind.0].get_weight()).unwrap());
-            // result.push(to_value(&self.population[best_ind.0].get_bias()).unwrap());
+            result.push(to_value(&self.population[best_ind.0].get_weight()).unwrap());
+            result.push(to_value(&self.population[best_ind.0].get_bias()).unwrap());
 
             self.update_wrapper(mutation_rate, crosssover_rate)
         }
@@ -197,17 +197,13 @@ pub fn new_wrapper_from_string(
             .map(|_| {
                 new_perceptron_to_wrapper(
                     Rc::clone(&data),
-                    {
-                        let mut params: Vec<usize> = Vec::new();
-                        (0..n_params)
-                            .fold(&mut params, |p, acc| {
-                                if rng.gen::<bool>() {
-                                    p.push(acc)
-                                }
-                                p
-                            })
-                            .to_owned()
-                    },
+                    (0..n_params).fold(Vec::new(), |mut v, i| {
+                        if rng.gen_bool(0.7) {
+                            v.push(i)
+                        }
+
+                        v
+                    }),
                     answ_index,
                     step_size,
                 )
